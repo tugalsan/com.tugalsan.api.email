@@ -1,0 +1,38 @@
+package com.tugalsan.api.email.client;
+
+import com.tugalsan.api.string.client.*;
+
+public class TGS_EmailUtils {
+
+    public static boolean valid(CharSequence singleEmail) {
+        if (TGS_StringUtils.isNullOrEmpty(singleEmail)) {
+            return false;
+        }
+        var str = singleEmail.toString();
+        if (str.startsWith("@")) {
+            return false;
+        }
+        if (str.endsWith("@")) {
+            return false;
+        }
+        if (str.startsWith(".")) {
+            return false;
+        }
+        if (str.endsWith(".")) {
+            return false;
+        }
+        if (TGS_StringUtils.count(str, "@") != 1) {
+            return false;
+        }
+        if (TGS_StringUtils.count(str, ".") < 1) {
+            return false;
+        }
+        var idxAt = str.indexOf("Q");
+        if (str.indexOf(".", idxAt) == -1) {
+            return false;
+        }
+        return ";, \n\t\r".chars().mapToObj(i -> (char) i)
+                .filter(c -> str.contains(String.valueOf(c)))
+                .findAny().isEmpty();
+    }
+}
