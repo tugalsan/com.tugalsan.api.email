@@ -7,6 +7,7 @@ import jakarta.mail.*;
 import jakarta.mail.internet.*;
 import com.tugalsan.api.file.server.*;
 import com.tugalsan.api.log.server.*;
+import com.tugalsan.api.unsafe.client.*;
 
 public class TS_EMailUtils {
 
@@ -24,17 +25,17 @@ public class TS_EMailUtils {
     public static boolean sendEmailText(Properties properties,
             CharSequence fromEmail, CharSequence fromText, CharSequence password,
             CharSequence toEmails, CharSequence subjectText, CharSequence bodyText) {
-        try {
+        return TGS_UnSafe.compile(() -> {
             var auth = createAuthenticator(fromEmail, password);
             var session = Session.getInstance(properties, auth);
             var msg = createMimeMessage(session, fromEmail, fromText, toEmails, subjectText);
             msg.setText(bodyText.toString(), "UTF-8");
             Transport.send(msg);
             return true;
-        } catch (Exception e) {
+        }, e -> {
             e.printStackTrace();
             return false;
-        }
+        });
     }
 
     public static boolean sendEmailContentTLS(
@@ -49,38 +50,35 @@ public class TS_EMailUtils {
     public static boolean sendEmailContent(Properties properties,
             CharSequence fromEmail, CharSequence fromText, CharSequence password,
             CharSequence toEmails, CharSequence subjectText, Multipart bodyContent) {
-        try {
+
+        return TGS_UnSafe.compile(() -> {
             var auth = createAuthenticator(fromEmail, password);
             var session = Session.getInstance(properties, auth);
             var msg = createMimeMessage(session, fromEmail, fromText, toEmails, subjectText);
             msg.setContent(bodyContent);
             Transport.send(msg);
             return true;
-        } catch (Exception e) {
+        }, e -> {
             e.printStackTrace();
             return false;
-        }
+        });
     }
 
     public static MimeMessage createMimeMessage(Session session, CharSequence fromEmail, CharSequence fromText, CharSequence toEmails, CharSequence subjectText) {
-        try {
+        return TGS_UnSafe.compile(() -> {
             var msg = new MimeMessage(session);
-            {
-                msg.addHeader("Content-type", "text/HTML; charset=UTF-8");
-                msg.addHeader("format", "flowed");
-                msg.addHeader("Content-Transfer-Encoding", "8bit");
-                msg.setSentDate(new Date());
+            msg.addHeader("Content-type", "text/HTML; charset=UTF-8");
+            msg.addHeader("format", "flowed");
+            msg.addHeader("Content-Transfer-Encoding", "8bit");
+            msg.setSentDate(new Date());
 
-                msg.setFrom(new InternetAddress(fromEmail.toString(), fromText.toString()));
-                msg.setReplyTo(InternetAddress.parse(fromEmail.toString(), false));
-                msg.setRecipients(Message.RecipientType.TO, InternetAddress.parse(toEmails.toString(), false));
+            msg.setFrom(new InternetAddress(fromEmail.toString(), fromText.toString()));
+            msg.setReplyTo(InternetAddress.parse(fromEmail.toString(), false));
+            msg.setRecipients(Message.RecipientType.TO, InternetAddress.parse(toEmails.toString(), false));
 
-                msg.setSubject(subjectText.toString(), "UTF-8");
-            }
+            msg.setSubject(subjectText.toString(), "UTF-8");
             return msg;
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
+        });
     }
 
     public static Multipart createMultipart(CharSequence bodyText) {
@@ -88,7 +86,7 @@ public class TS_EMailUtils {
     }
 
     public static Multipart createMultipart_File(CharSequence bodyText, Path filePath, CharSequence optionalFileName) {
-        try {
+        return TGS_UnSafe.compile(() -> {
             var mp = new MimeMultipart();
             var mbp1 = new MimeBodyPart();
             mbp1.setText(bodyText.toString());
@@ -96,22 +94,18 @@ public class TS_EMailUtils {
             if (filePath == null) {
                 return mp;
             }
-            if (optionalFileName == null) {
-                optionalFileName = TS_FileUtils.getNameFull(filePath);
-            }
+            var fileName = optionalFileName == null ? TS_FileUtils.getNameFull(filePath) : optionalFileName;
             var mbp2 = new MimeBodyPart();
             var source = new FileDataSource(filePath.toString());
             mbp2.setDataHandler(new DataHandler(source));
-            mbp2.setFileName(optionalFileName.toString());
+            mbp2.setFileName(fileName.toString());
             mp.addBodyPart(mbp2);
             return mp;
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
+        });
     }
 
     public static Multipart createMultipart_Image(CharSequence bodyText, Path filePath, CharSequence optionalFileName) {
-        try {
+        return TGS_UnSafe.compile(() -> {
             var mp = new MimeMultipart();
             var mbp1 = new MimeBodyPart();
             mbp1.setText(bodyText.toString());
@@ -119,22 +113,18 @@ public class TS_EMailUtils {
             if (filePath == null) {
                 return mp;
             }
-            if (optionalFileName == null) {
-                optionalFileName = TS_FileUtils.getNameFull(filePath);
-            }
+            var fileName = optionalFileName == null ? TS_FileUtils.getNameFull(filePath) : optionalFileName;
             var mbp2 = new MimeBodyPart();
             var source = new FileDataSource(filePath.toString());
             mbp2.setDataHandler(new DataHandler(source));
-            mbp2.setFileName(optionalFileName.toString());
+            mbp2.setFileName(fileName.toString());
             mbp2.setHeader("Content-ID", "image_id");//Trick is to add the content-id header here
             mp.addBodyPart(mbp2);
             var mbp3 = new MimeBodyPart();//third part for displaying image in the email body
             mbp3.setContent("<h1>Attached Image</h1><img src='cid:image_id'>", "text/html");
             mp.addBodyPart(mbp3);
             return mp;
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
+        });
     }
 
     public static Authenticator createAuthenticator(CharSequence fromEmail, CharSequence password) {
