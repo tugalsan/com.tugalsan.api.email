@@ -11,7 +11,7 @@ import com.tugalsan.api.unsafe.client.*;
 
 public class TS_EMailUtils {
 
-    final private static TS_Log d = TS_Log.of(TS_EMailUtils.class.getSimpleName());
+    final private static TS_Log d = TS_Log.of(TS_EMailUtils.class);
 
     public static boolean sendEmailTextTLS(
             String smtpServer, String fromEmail, String fromPassword,
