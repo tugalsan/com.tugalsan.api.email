@@ -1,11 +1,11 @@
 package com.tugalsan.api.email.server;
 
+import com.tugalsan.api.file.server.TS_FileUtils;
 import java.util.*;
 import java.nio.file.*;
 import jakarta.activation.*;
 import jakarta.mail.*;
 import jakarta.mail.internet.*;
-import com.tugalsan.api.file.server.*;
 import com.tugalsan.api.log.server.*;
 import com.tugalsan.api.unsafe.client.*;
 
@@ -13,49 +13,15 @@ public class TS_EMailUtils {
 
     final private static TS_Log d = TS_Log.of(TS_EMailUtils.class);
 
-    public static boolean sendEmailTextTLS(
-            String smtpServer, String fromEmail, String fromPassword,
-            String toEmails, String subjectText, String bodyText) {
-        return sendEmailText(TS_EMailUtils.createPropertiesTLS(smtpServer),
-                fromEmail, fromEmail, fromPassword,
-                toEmails, subjectText, bodyText
-        );
-    }
-
-    public static boolean sendEmailText(Properties properties,
-            CharSequence fromEmail, CharSequence fromText, CharSequence password,
-            CharSequence toEmails, CharSequence subjectText, CharSequence bodyText) {
-        return TGS_UnSafe.compile(() -> {
-            var auth = createAuthenticator(fromEmail, password);
-            var session = Session.getInstance(properties, auth);
-            var msg = createMimeMessage(session, fromEmail, fromText, toEmails, subjectText);
-            msg.setText(bodyText.toString(), "UTF-8");
-            Transport.send(msg);
-            return true;
-        }, e -> {
-            e.printStackTrace();
-            return false;
-        });
-    }
-
-    public static boolean sendEmailContentTLS(
-            String smtpServer, String fromEmail, String fromPassword,
-            String toEmails, String subjectText, String bodyText) {
-        return sendEmailContent(TS_EMailUtils.createPropertiesTLS(smtpServer),
-                fromEmail, fromEmail, fromPassword,
-                toEmails, subjectText, TS_EMailUtils.createMultipart(bodyText)
-        );
-    }
-
     public static boolean sendEmailContent(Properties properties,
             CharSequence fromEmail, CharSequence fromText, CharSequence password,
-            CharSequence toEmails, CharSequence subjectText, Multipart bodyContent) {
+            CharSequence toEmails, CharSequence subjectText, MimeBodyPart... bodyparts) {
 
         return TGS_UnSafe.compile(() -> {
             var auth = createAuthenticator(fromEmail, password);
             var session = Session.getInstance(properties, auth);
             var msg = createMimeMessage(session, fromEmail, fromText, toEmails, subjectText);
-            msg.setContent(bodyContent);
+            msg.setContent(createMultipart(bodyparts));
             Transport.send(msg);
             return true;
         }, e -> {
@@ -81,49 +47,41 @@ public class TS_EMailUtils {
         });
     }
 
-    public static Multipart createMultipart(CharSequence bodyText) {
-        return createMultipart_File(bodyText, null, null);
+    public static Multipart createMultipart(MimeBodyPart... bodyparts) {
+        var mp = new MimeMultipart();
+        Arrays.stream(bodyparts).forEachOrdered(bp -> TGS_UnSafe.execute(() -> mp.addBodyPart(bp)));
+        return mp;
     }
 
-    public static Multipart createMultipart_File(CharSequence bodyText, Path filePath, CharSequence optionalFileName) {
+    public static MimeBodyPart createMimeBodyPartText(CharSequence bodyText) {
         return TGS_UnSafe.compile(() -> {
-            var mp = new MimeMultipart();
-            var mbp1 = new MimeBodyPart();
-            mbp1.setText(bodyText.toString());
-            mp.addBodyPart(mbp1);
-            if (filePath == null) {
-                return mp;
-            }
-            var fileName = optionalFileName == null ? TS_FileUtils.getNameFull(filePath) : optionalFileName;
-            var mbp2 = new MimeBodyPart();
-            var source = new FileDataSource(filePath.toString());
-            mbp2.setDataHandler(new DataHandler(source));
-            mbp2.setFileName(fileName.toString());
-            mp.addBodyPart(mbp2);
-            return mp;
+            var mbp = new MimeBodyPart();
+            mbp.setContent("<p style = \"font-family: fontText, Arial Unicode MS, Arial,Helvetica,sans-serif;font-size:11px>\">" + bodyText + "</p>", "text/html; charset=utf-8");
+            return mbp;
         });
     }
 
-    public static Multipart createMultipart_Image(CharSequence bodyText, Path filePath, CharSequence optionalFileName) {
+    public static MimeBodyPart createMimeBodyPartFile(Path path, int idx) {
         return TGS_UnSafe.compile(() -> {
-            var mp = new MimeMultipart();
-            var mbp1 = new MimeBodyPart();
-            mbp1.setText(bodyText.toString());
-            mp.addBodyPart(mbp1);
-            if (filePath == null) {
-                return mp;
-            }
-            var fileName = optionalFileName == null ? TS_FileUtils.getNameFull(filePath) : optionalFileName;
-            var mbp2 = new MimeBodyPart();
-            var source = new FileDataSource(filePath.toString());
-            mbp2.setDataHandler(new DataHandler(source));
-            mbp2.setFileName(fileName.toString());
-            mbp2.setHeader("Content-ID", "image_id");//Trick is to add the content-id header here
-            mp.addBodyPart(mbp2);
-            var mbp3 = new MimeBodyPart();//third part for displaying image in the email body
-            mbp3.setContent("<h1>Attached Image</h1><img src='cid:image_id'>", "text/html");
-            mp.addBodyPart(mbp3);
-            return mp;
+            var mbp = new MimeBodyPart();
+            mbp.setDataHandler(new DataHandler(new FileDataSource(path.toString())));
+            mbp.setFileName("file" + idx + "." + TS_FileUtils.getNameType(path));
+            return mbp;
+        });
+    }
+
+    public static MimeBodyPart[] createMimeBodyPartsImg(Path path, int idx) {
+        return TGS_UnSafe.compile(() -> {
+            var mbps = new MimeBodyPart[2];
+            var imgId = "img" + idx;
+            mbps[0] = new MimeBodyPart();
+            mbps[0].setHeader("Content-ID", imgId);//Trick is to add the content-id header here
+            mbps[0].setDisposition(MimeBodyPart.INLINE);
+            mbps[0].setDataHandler(new DataHandler(new FileDataSource(path.toString())));
+            mbps[0].setFileName(imgId + "." + TS_FileUtils.getNameType(path));
+            mbps[1] = new MimeBodyPart();//third part for displaying image in the email body
+            mbps[1].setContent("<h1>Attached Image</h1><img src='cid:" + imgId + "'>", "text/html");
+            return mbps;
         });
     }
 
