@@ -26,6 +26,7 @@ public class TS_EMailUtils {
             var mp = new MimeMultipart();
             var mbp = new MimeBodyPart();
             mbp.setContent("<p " + optionalFontCss + ">" + bodyHtml + "</p>", "text/html; charset=utf-8");
+            mp.addBodyPart(mbp);
             Arrays.stream(files).forEachOrdered(file -> TGS_UnSafe.execute(() -> mp.addBodyPart(file)));
             msg.setContent(mp);
             Transport.send(msg);
