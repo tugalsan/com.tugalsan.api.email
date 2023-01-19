@@ -7,6 +7,7 @@ import jakarta.activation.*;
 import jakarta.mail.*;
 import jakarta.mail.internet.*;
 import com.tugalsan.api.log.server.*;
+import com.tugalsan.api.pack.client.TGS_Pack2;
 import com.tugalsan.api.unsafe.client.*;
 
 public class TS_EMailUtils {
@@ -74,17 +75,17 @@ public class TS_EMailUtils {
         });
     }
 
-    public static MimeBodyPart[] createMimeBodyPartsImg(Path path, int idx) {
+    public static TGS_Pack2<MimeBodyPart, MimeBodyPart> createMimeBodyPartsImg(Path path, int idx) {
         return TGS_UnSafe.compile(() -> {
-            var mbps = new MimeBodyPart[2];
+            TGS_Pack2<MimeBodyPart, MimeBodyPart> mbps = TGS_Pack2.of();
             var imgId = "img" + idx;
-            mbps[0] = new MimeBodyPart();
-            mbps[0].setHeader("Content-ID", imgId);//Trick is to add the content-id header here
-            mbps[0].setDisposition(MimeBodyPart.INLINE);
-            mbps[0].setDataHandler(new DataHandler(new FileDataSource(path.toString())));
-            mbps[0].setFileName(imgId + "." + TS_FileUtils.getNameType(path));
-            mbps[1] = new MimeBodyPart();//third part for displaying image in the email body
-            mbps[1].setContent("<h1>Attached Image</h1><img src='cid:" + imgId + "'>", "text/html");
+            mbps.value0 = new MimeBodyPart();
+            mbps.value0.setHeader("Content-ID", imgId);//Trick is to add the content-id header here
+            mbps.value0.setDisposition(MimeBodyPart.INLINE);
+            mbps.value0.setDataHandler(new DataHandler(new FileDataSource(path.toString())));
+            mbps.value0.setFileName(imgId + "." + TS_FileUtils.getNameType(path));
+            mbps.value1 = new MimeBodyPart();//third part for displaying image in the email body
+            mbps.value1.setContent("<h1>Attached Image</h1><img src='cid:" + imgId + "'>", "text/html");
             return mbps;
         });
     }
