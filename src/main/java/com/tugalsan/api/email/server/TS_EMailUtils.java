@@ -75,17 +75,16 @@ public class TS_EMailUtils {
         });
     }
 
-    public static TGS_Pack2<MimeBodyPart, MimeBodyPart> createMimeBodyPartsImg(Path path, int idx) {
+    public static TGS_Pack2<String, MimeBodyPart> createMimeBodyPartsImg(Path path, int idx) {
         return TGS_UnSafe.compile(() -> {
-            TGS_Pack2<MimeBodyPart, MimeBodyPart> mbps = TGS_Pack2.of();
+            TGS_Pack2<String, MimeBodyPart> mbps = TGS_Pack2.of();
             var imgId = "img" + idx;
-            mbps.value0 = new MimeBodyPart();
-            mbps.value0.setHeader("Content-ID", imgId);//Trick is to add the content-id header here
-            mbps.value0.setDisposition(MimeBodyPart.INLINE);
-            mbps.value0.setDataHandler(new DataHandler(new FileDataSource(path.toAbsolutePath().toString())));
-            mbps.value0.setFileName(imgId + "." + TS_FileUtils.getNameType(path));
-            mbps.value1 = new MimeBodyPart();//third part for displaying image in the email body
-            mbps.value1.setContent("<img src='cid:" + imgId + "'>", "text/html");
+            mbps.value0 = "<img src='cid:" + imgId + "'>";
+            mbps.value1 = new MimeBodyPart();
+            mbps.value1.setHeader("Content-ID", imgId);
+            mbps.value1.setDisposition(MimeBodyPart.INLINE);
+            mbps.value1.setDataHandler(new DataHandler(new FileDataSource(path.toAbsolutePath().toString())));
+            mbps.value1.setFileName(imgId + "." + TS_FileUtils.getNameType(path));
             return mbps;
         });
     }
