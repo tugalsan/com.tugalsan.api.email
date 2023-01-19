@@ -13,7 +13,7 @@ public class TS_EMailUtils {
 
     final private static TS_Log d = TS_Log.of(TS_EMailUtils.class);
 
-    public static boolean sendEmailContent(Properties properties,
+    public static boolean send(Properties properties,
             CharSequence fromEmail, CharSequence fromText, CharSequence password,
             CharSequence toEmails, CharSequence subjectText, MimeBodyPart... bodyparts) {
 
