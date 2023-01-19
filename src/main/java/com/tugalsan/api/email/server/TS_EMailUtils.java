@@ -25,7 +25,7 @@ public class TS_EMailUtils {
             var msg = createMimeMessage(session, fromEmail, fromText, toEmails, subjectText);
             var mp = new MimeMultipart();
             var mbp = new MimeBodyPart();
-            mbp.setContent("<p " + optionalFontCss + "> >" + bodyHtml + "</p>", "text/html; charset=utf-8");
+            mbp.setContent("<p " + optionalFontCss + ">" + bodyHtml + "</p>", "text/html; charset=utf-8");
             mp.addBodyPart(mbp);
             Arrays.stream(files).forEachOrdered(file -> TGS_UnSafe.execute(() -> mp.addBodyPart(file)));
             msg.setContent(mp);
@@ -55,7 +55,7 @@ public class TS_EMailUtils {
     }
 
     public static String createBasicFontCss() {
-        return "style = \"font-family: fontText, Arial Unicode MS, Arial,Helvetica,sans-serif;font-size:11px";
+        return "style = \"font-family: fontText, Arial Unicode MS, Arial,Helvetica,sans-serif;font-size:11px;\"";
     }
 
     public static MimeBodyPart createMimeBodyPartFile(Path path, int idx) {
