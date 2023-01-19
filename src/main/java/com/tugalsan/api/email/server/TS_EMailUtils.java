@@ -69,7 +69,7 @@ public class TS_EMailUtils {
     public static MimeBodyPart createMimeBodyPartFile(Path path, int idx) {
         return TGS_UnSafe.compile(() -> {
             var mbp = new MimeBodyPart();
-            mbp.setDataHandler(new DataHandler(new FileDataSource(path.toString())));
+            mbp.setDataHandler(new DataHandler(new FileDataSource(path.toAbsolutePath().toString())));
             mbp.setFileName("file" + idx + "." + TS_FileUtils.getNameType(path));
             return mbp;
         });
@@ -82,7 +82,7 @@ public class TS_EMailUtils {
             mbps.value0 = new MimeBodyPart();
             mbps.value0.setHeader("Content-ID", imgId);//Trick is to add the content-id header here
             mbps.value0.setDisposition(MimeBodyPart.INLINE);
-            mbps.value0.setDataHandler(new DataHandler(new FileDataSource(path.toString())));
+            mbps.value0.setDataHandler(new DataHandler(new FileDataSource(path.toAbsolutePath().toString())));
             mbps.value0.setFileName(imgId + "." + TS_FileUtils.getNameType(path));
             mbps.value1 = new MimeBodyPart();//third part for displaying image in the email body
             mbps.value1.setContent("<img src='cid:" + imgId + "'>", "text/html");
