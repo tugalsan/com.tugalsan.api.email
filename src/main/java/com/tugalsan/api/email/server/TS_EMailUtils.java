@@ -16,13 +16,18 @@ public class TS_EMailUtils {
 
     public static boolean send(Properties properties,
             CharSequence fromEmail, CharSequence fromText, CharSequence password,
-            CharSequence toEmails, CharSequence subjectText, MimeBodyPart... bodyparts) {
+            CharSequence toEmails, CharSequence subjectText,
+            CharSequence optionalFontCss, CharSequence bodyHtml, MimeBodyPart... files) {
 
         return TGS_UnSafe.compile(() -> {
             var auth = createAuthenticator(fromEmail, password);
             var session = Session.getInstance(properties, auth);
             var msg = createMimeMessage(session, fromEmail, fromText, toEmails, subjectText);
-            msg.setContent(createMultipart(bodyparts));
+            var mp = new MimeMultipart();
+            var mbp = new MimeBodyPart();
+            mbp.setContent("<p " + optionalFontCss + ">" + bodyHtml + "</p>", "text/html; charset=utf-8");
+            Arrays.stream(files).forEachOrdered(file -> TGS_UnSafe.execute(() -> mp.addBodyPart(file)));
+            msg.setContent(mp);
             Transport.send(msg);
             return true;
         }, e -> {
@@ -48,22 +53,8 @@ public class TS_EMailUtils {
         });
     }
 
-    public static Multipart createMultipart(MimeBodyPart... bodyparts) {
-        var mp = new MimeMultipart();
-        Arrays.stream(bodyparts).forEachOrdered(bp -> TGS_UnSafe.execute(() -> mp.addBodyPart(bp)));
-        return mp;
-    }
-
     public static String createBasicFontCss() {
         return "style = \"font-family: fontText, Arial Unicode MS, Arial,Helvetica,sans-serif;font-size:11px";
-    }
-
-    public static MimeBodyPart createMimeBodyPartHtml(CharSequence optionalFontCss, CharSequence bodyHtml) {
-        return TGS_UnSafe.compile(() -> {
-            var mbp = new MimeBodyPart();
-            mbp.setContent("<p " + optionalFontCss + ">" + bodyHtml + "</p>", "text/html; charset=utf-8");
-            return mbp;
-        });
     }
 
     public static MimeBodyPart createMimeBodyPartFile(Path path, int idx) {
