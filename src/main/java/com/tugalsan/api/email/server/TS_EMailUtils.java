@@ -85,7 +85,7 @@ public class TS_EMailUtils {
             mbps.value0.setDataHandler(new DataHandler(new FileDataSource(path.toString())));
             mbps.value0.setFileName(imgId + "." + TS_FileUtils.getNameType(path));
             mbps.value1 = new MimeBodyPart();//third part for displaying image in the email body
-            mbps.value1.setContent("<h1>Attached Image</h1><img src='cid:" + imgId + "'>", "text/html");
+            mbps.value1.setContent("<img src='cid:" + imgId + "'>", "text/html");
             return mbps;
         });
     }
