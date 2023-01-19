@@ -8,6 +8,7 @@ import jakarta.mail.*;
 import jakarta.mail.internet.*;
 import com.tugalsan.api.log.server.*;
 import com.tugalsan.api.pack.client.TGS_Pack2;
+import com.tugalsan.api.string.client.TGS_StringUtils;
 import com.tugalsan.api.unsafe.client.*;
 
 public class TS_EMailUtils {
@@ -25,7 +26,7 @@ public class TS_EMailUtils {
             var msg = createMimeMessage(session, fromEmail, fromText, toEmails, subjectText);
             var mp = new MimeMultipart();
             var mbp = new MimeBodyPart();
-            mbp.setContent("<p " + optionalFontCss + ">" + bodyHtml + "</p>", "text/html; charset=utf-8");
+            mbp.setContent("<p " + TGS_StringUtils.toEmptyIfNull(optionalFontCss) + ">" + bodyHtml + "</p>", "text/html; charset=utf-8");
             mp.addBodyPart(mbp);
             Arrays.stream(files).forEachOrdered(file -> TGS_UnSafe.execute(() -> mp.addBodyPart(file)));
             msg.setContent(mp);
