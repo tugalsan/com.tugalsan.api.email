@@ -53,10 +53,14 @@ public class TS_EMailUtils {
         return mp;
     }
 
-    public static MimeBodyPart createMimeBodyPartText(CharSequence bodyText) {
+    public static String createBasicFontCss() {
+        return "style = \"font-family: fontText, Arial Unicode MS, Arial,Helvetica,sans-serif;font-size:11px";
+    }
+
+    public static MimeBodyPart createMimeBodyPartHtml(CharSequence optionalFontCss, CharSequence bodyHtml) {
         return TGS_UnSafe.compile(() -> {
             var mbp = new MimeBodyPart();
-            mbp.setContent("<p style = \"font-family: fontText, Arial Unicode MS, Arial,Helvetica,sans-serif;font-size:11px>\">" + bodyText + "</p>", "text/html; charset=utf-8");
+            mbp.setContent("<p " + optionalFontCss + ">" + bodyHtml + "</p>", "text/html; charset=utf-8");
             return mbp;
         });
     }
