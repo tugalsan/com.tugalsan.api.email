@@ -20,7 +20,7 @@ public class TS_EMailUtils {
             CharSequence toEmails, CharSequence subjectText,
             CharSequence optionalFontCss, CharSequence bodyHtml, MimeBodyPart... files) {
 
-        return TGS_UnSafe.compile(() -> {
+        return TGS_UnSafe.call(() -> {
             var auth = createAuthenticator(fromEmail, password);
             var session = Session.getInstance(properties, auth);
             var msg = createMimeMessage(session, fromEmail, fromText, toEmails, subjectText);
@@ -28,7 +28,7 @@ public class TS_EMailUtils {
             var mbp = new MimeBodyPart();
             mbp.setContent("<p " + TGS_StringUtils.toEmptyIfNull(optionalFontCss) + ">" + bodyHtml + "</p>", "text/html; charset=utf-8");
             mp.addBodyPart(mbp);
-            Arrays.stream(files).forEachOrdered(file -> TGS_UnSafe.execute(() -> mp.addBodyPart(file)));
+            Arrays.stream(files).forEachOrdered(file -> TGS_UnSafe.run(() -> mp.addBodyPart(file)));
             msg.setContent(mp);
             Transport.send(msg);
             return true;
@@ -39,7 +39,7 @@ public class TS_EMailUtils {
     }
 
     public static MimeMessage createMimeMessage(Session session, CharSequence fromEmail, CharSequence fromText, CharSequence toEmails, CharSequence subjectText) {
-        return TGS_UnSafe.compile(() -> {
+        return TGS_UnSafe.call(() -> {
             var msg = new MimeMessage(session);
             msg.addHeader("Content-type", "text/HTML; charset=UTF-8");
             msg.addHeader("format", "flowed");
@@ -60,7 +60,7 @@ public class TS_EMailUtils {
     }
 
     public static MimeBodyPart createMimeBodyPartFile(Path path, int idx) {
-        return TGS_UnSafe.compile(() -> {
+        return TGS_UnSafe.call(() -> {
             var mbp = new MimeBodyPart();
             mbp.setDataHandler(new DataHandler(new FileDataSource(path.toAbsolutePath().toString())));
             mbp.setFileName("file" + idx + "." + TS_FileUtils.getNameType(path));
@@ -69,7 +69,7 @@ public class TS_EMailUtils {
     }
 
     public static TGS_Pack2<String, MimeBodyPart> createMimeBodyPartsImg(Path path, int idx) {
-        return TGS_UnSafe.compile(() -> {
+        return TGS_UnSafe.call(() -> {
             TGS_Pack2<String, MimeBodyPart> mbps = TGS_Pack2.of();
             var imgId = "img" + idx;
             mbps.value0 = "<img src='cid:" + imgId + "'>";
