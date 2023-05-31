@@ -7,7 +7,7 @@ import jakarta.activation.*;
 import jakarta.mail.*;
 import jakarta.mail.internet.*;
 import com.tugalsan.api.log.server.*;
-import com.tugalsan.api.pack.client.TGS_Pack2;
+import com.tugalsan.api.tuple.client.TGS_Tuple2;
 import com.tugalsan.api.string.client.TGS_StringUtils;
 import com.tugalsan.api.unsafe.client.*;
 
@@ -68,9 +68,9 @@ public class TS_EMailUtils {
         });
     }
 
-    public static TGS_Pack2<String, MimeBodyPart> createMimeBodyPartsImg(Path path, int idx) {
+    public static TGS_Tuple2<String, MimeBodyPart> createMimeBodyPartsImg(Path path, int idx) {
         return TGS_UnSafe.call(() -> {
-            TGS_Pack2<String, MimeBodyPart> mbps = TGS_Pack2.of();
+            TGS_Tuple2<String, MimeBodyPart> mbps = TGS_Tuple2.of();
             var imgId = "img" + idx;
             mbps.value0 = "<img src='cid:" + imgId + "'>";
             mbps.value1 = new MimeBodyPart();
