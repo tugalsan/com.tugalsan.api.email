@@ -1,5 +1,4 @@
 module com.tugalsan.api.email {
-    requires gwt.user;
     requires jakarta.activation;
     requires jakarta.mail;
     requires com.tugalsan.api.string;
