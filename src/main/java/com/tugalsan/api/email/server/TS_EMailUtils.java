@@ -6,15 +6,13 @@ import java.nio.file.*;
 import jakarta.activation.*;
 import jakarta.mail.*;
 import jakarta.mail.internet.*;
-import com.tugalsan.api.log.server.*;
 import com.tugalsan.api.tuple.client.TGS_Tuple2;
 import com.tugalsan.api.string.client.TGS_StringUtils;
 import com.tugalsan.api.unsafe.client.*;
 
 public class TS_EMailUtils {
 
-    final private static TS_Log d = TS_Log.of(TS_EMailUtils.class);
-
+//    final private static TS_Log d = TS_Log.of(TS_EMailUtils.class);
     public static boolean send(Properties properties,
             CharSequence fromEmail, CharSequence fromText, CharSequence password,
             CharSequence toEmails, CharSequence subjectText,
@@ -84,6 +82,7 @@ public class TS_EMailUtils {
 
     public static Authenticator createAuthenticator(CharSequence fromEmail, CharSequence password) {
         return new Authenticator() {
+            @Override
             protected PasswordAuthentication getPasswordAuthentication() {
                 return new PasswordAuthentication(fromEmail.toString(), password.toString());
             }
