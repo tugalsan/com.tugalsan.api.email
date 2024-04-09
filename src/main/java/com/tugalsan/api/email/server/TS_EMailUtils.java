@@ -21,7 +21,7 @@ public class TS_EMailUtils {
             var auth = createAuthenticator(fromEmail, password);
             var session = Session.getInstance(properties, auth);
             var u_msg = createMimeMessage(session, fromEmail, fromText, toEmails, subjectText);
-            if (u_msg.isError()) {
+            if (u_msg.isExcuse()) {
                 return TGS_Union.ofExcuse(u_msg.excuse());
             }
             var msg = u_msg.value();
