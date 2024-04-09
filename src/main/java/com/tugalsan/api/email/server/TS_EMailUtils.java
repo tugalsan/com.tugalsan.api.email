@@ -6,38 +6,42 @@ import java.nio.file.*;
 import jakarta.activation.*;
 import jakarta.mail.*;
 import jakarta.mail.internet.*;
-import com.tugalsan.api.tuple.client.TGS_Tuple2;
 import com.tugalsan.api.string.client.TGS_StringUtils;
-import com.tugalsan.api.unsafe.client.*;
+import com.tugalsan.api.union.client.TGS_Union;
+import java.io.UnsupportedEncodingException;
 
 public class TS_EMailUtils {
 
 //    final private static TS_Log d = TS_Log.of(TS_EMailUtils.class);
-    public static boolean send(Properties properties,
+    public static TGS_Union<Boolean> send(Properties properties,
             CharSequence fromEmail, CharSequence fromText, CharSequence password,
             CharSequence toEmails, CharSequence subjectText,
             CharSequence optionalFontCss, CharSequence bodyHtml, MimeBodyPart... files) {
-
-        return TGS_UnSafe.call(() -> {
+        try {
             var auth = createAuthenticator(fromEmail, password);
             var session = Session.getInstance(properties, auth);
-            var msg = createMimeMessage(session, fromEmail, fromText, toEmails, subjectText);
+            var u_msg = createMimeMessage(session, fromEmail, fromText, toEmails, subjectText);
+            if (u_msg.isError()) {
+                return TGS_Union.ofExcuse(u_msg.excuse());
+            }
+            var msg = u_msg.value();
             var mp = new MimeMultipart();
             var mbp = new MimeBodyPart();
             mbp.setContent("<p " + TGS_StringUtils.toEmptyIfNull(optionalFontCss) + ">" + bodyHtml + "</p>", "text/html; charset=utf-8");
             mp.addBodyPart(mbp);
-            Arrays.stream(files).forEachOrdered(file -> TGS_UnSafe.run(() -> mp.addBodyPart(file)));
+            for (var file : files) {
+                mp.addBodyPart(file);
+            }
             msg.setContent(mp);
             Transport.send(msg);
-            return true;
-        }, e -> {
-            e.printStackTrace();
-            return false;
-        });
+            return TGS_Union.of(true);
+        } catch (MessagingException ex) {
+            return TGS_Union.ofExcuse(ex);
+        }
     }
 
-    public static MimeMessage createMimeMessage(Session session, CharSequence fromEmail, CharSequence fromText, CharSequence toEmails, CharSequence subjectText) {
-        return TGS_UnSafe.call(() -> {
+    public static TGS_Union<MimeMessage> createMimeMessage(Session session, CharSequence fromEmail, CharSequence fromText, CharSequence toEmails, CharSequence subjectText) {
+        try {
             var msg = new MimeMessage(session);
             msg.addHeader("Content-type", "text/HTML; charset=UTF-8");
             msg.addHeader("format", "flowed");
@@ -49,35 +53,43 @@ public class TS_EMailUtils {
             msg.setRecipients(Message.RecipientType.TO, InternetAddress.parse(toEmails.toString(), false));
 
             msg.setSubject(subjectText.toString(), "UTF-8");
-            return msg;
-        });
+            return TGS_Union.of(msg);
+        } catch (MessagingException | UnsupportedEncodingException ex) {
+            return TGS_Union.ofExcuse(ex);
+        }
     }
 
     public static String createBasicFontCss() {
         return "style = \"font-family: fontText, Arial Unicode MS, Arial,Helvetica,sans-serif;font-size:11px;\"";
     }
 
-    public static MimeBodyPart createMimeBodyPartFile(Path path, int idx) {
-        return TGS_UnSafe.call(() -> {
+    public static TGS_Union<MimeBodyPart> createMimeBodyPartFile(Path path, int idx) {
+        try {
             var mbp = new MimeBodyPart();
             mbp.setDataHandler(new DataHandler(new FileDataSource(path.toAbsolutePath().toString())));
             mbp.setFileName("file" + idx + "." + TS_FileUtils.getNameType(path));
-            return mbp;
-        });
+            return TGS_Union.of(mbp);
+        } catch (MessagingException ex) {
+            return TGS_Union.ofExcuse(ex);
+        }
     }
 
-    public static TGS_Tuple2<String, MimeBodyPart> createMimeBodyPartsImg(Path path, int idx) {
-        return TGS_UnSafe.call(() -> {
-            TGS_Tuple2<String, MimeBodyPart> mbps = TGS_Tuple2.of();
+    public static TGS_Union<MimeBodyPartsImg> createMimeBodyPartsImg(Path path, int idx) {
+        try {
             var imgId = "img" + idx;
-            mbps.value0 = "<img src='cid:" + imgId + "'>";
-            mbps.value1 = new MimeBodyPart();
-            mbps.value1.setHeader("Content-ID", imgId);
-            mbps.value1.setDisposition(MimeBodyPart.INLINE);
-            mbps.value1.setDataHandler(new DataHandler(new FileDataSource(path.toAbsolutePath().toString())));
-            mbps.value1.setFileName(imgId + "." + TS_FileUtils.getNameType(path));
-            return mbps;
-        });
+            var mbps = new MimeBodyPartsImg("<img src='cid:" + imgId + "'>", new MimeBodyPart());
+            mbps.bp.setHeader("Content-ID", imgId);
+            mbps.bp.setDisposition(MimeBodyPart.INLINE);
+            mbps.bp.setDataHandler(new DataHandler(new FileDataSource(path.toAbsolutePath().toString())));
+            mbps.bp.setFileName(imgId + "." + TS_FileUtils.getNameType(path));
+            return TGS_Union.of(mbps);
+        } catch (MessagingException ex) {
+            return TGS_Union.ofExcuse(ex);
+        }
+    }
+
+    public static record MimeBodyPartsImg(String htmlcode_id, MimeBodyPart bp) {
+
     }
 
     public static Authenticator createAuthenticator(CharSequence fromEmail, CharSequence password) {
