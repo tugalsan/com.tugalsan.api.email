@@ -7,14 +7,14 @@ import jakarta.activation.*;
 import jakarta.mail.*;
 import jakarta.mail.internet.*;
 import com.tugalsan.api.string.client.TGS_StringUtils;
-import com.tugalsan.api.union.client.TGS_Union;
 import com.tugalsan.api.union.client.TGS_UnionExcuse;
+import com.tugalsan.api.union.client.TGS_UnionExcuseVoid;
 import java.io.UnsupportedEncodingException;
 
 public class TS_EMailUtils {
 
 //    final private static TS_Log d = TS_Log.of(TS_EMailUtils.class);
-    public static TGS_UnionExcuse send(Properties properties,
+    public static TGS_UnionExcuseVoid send(Properties properties,
             CharSequence fromEmail, CharSequence fromText, CharSequence password,
             CharSequence toEmails, CharSequence subjectText,
             CharSequence optionalFontCss, CharSequence bodyHtml, MimeBodyPart... files) {
@@ -23,7 +23,7 @@ public class TS_EMailUtils {
             var session = Session.getInstance(properties, auth);
             var u_msg = createMimeMessage(session, fromEmail, fromText, toEmails, subjectText);
             if (u_msg.isExcuse()) {
-                return TGS_UnionExcuse.ofExcuse(u_msg.excuse());
+                return TGS_UnionExcuseVoid.ofExcuse(u_msg.excuse());
             }
             var msg = u_msg.value();
             var mp = new MimeMultipart();
@@ -35,13 +35,13 @@ public class TS_EMailUtils {
             }
             msg.setContent(mp);
             Transport.send(msg);
-            return TGS_UnionExcuse.ofVoid();
+            return TGS_UnionExcuseVoid.ofVoid();
         } catch (MessagingException ex) {
-            return TGS_UnionExcuse.ofExcuse(ex);
+            return TGS_UnionExcuseVoid.ofExcuse(ex);
         }
     }
 
-    public static TGS_Union<MimeMessage> createMimeMessage(Session session, CharSequence fromEmail, CharSequence fromText, CharSequence toEmails, CharSequence subjectText) {
+    public static TGS_UnionExcuse<MimeMessage> createMimeMessage(Session session, CharSequence fromEmail, CharSequence fromText, CharSequence toEmails, CharSequence subjectText) {
         try {
             var msg = new MimeMessage(session);
             msg.addHeader("Content-type", "text/HTML; charset=UTF-8");
@@ -54,9 +54,9 @@ public class TS_EMailUtils {
             msg.setRecipients(Message.RecipientType.TO, InternetAddress.parse(toEmails.toString(), false));
 
             msg.setSubject(subjectText.toString(), "UTF-8");
-            return TGS_Union.of(msg);
+            return TGS_UnionExcuse.of(msg);
         } catch (MessagingException | UnsupportedEncodingException ex) {
-            return TGS_Union.ofExcuse(ex);
+            return TGS_UnionExcuse.ofExcuse(ex);
         }
     }
 
@@ -64,18 +64,18 @@ public class TS_EMailUtils {
         return "style = \"font-family: fontText, Arial Unicode MS, Arial,Helvetica,sans-serif;font-size:11px;\"";
     }
 
-    public static TGS_Union<MimeBodyPart> createMimeBodyPartFile(Path path, int idx) {
+    public static TGS_UnionExcuse<MimeBodyPart> createMimeBodyPartFile(Path path, int idx) {
         try {
             var mbp = new MimeBodyPart();
             mbp.setDataHandler(new DataHandler(new FileDataSource(path.toAbsolutePath().toString())));
             mbp.setFileName("file" + idx + "." + TS_FileUtils.getNameType(path));
-            return TGS_Union.of(mbp);
+            return TGS_UnionExcuse.of(mbp);
         } catch (MessagingException ex) {
-            return TGS_Union.ofExcuse(ex);
+            return TGS_UnionExcuse.ofExcuse(ex);
         }
     }
 
-    public static TGS_Union<MimeBodyPartsImg> createMimeBodyPartsImg(Path path, int idx) {
+    public static TGS_UnionExcuse<MimeBodyPartsImg> createMimeBodyPartsImg(Path path, int idx) {
         try {
             var imgId = "img" + idx;
             var mbps = new MimeBodyPartsImg("<img src='cid:" + imgId + "'>", new MimeBodyPart());
@@ -83,9 +83,9 @@ public class TS_EMailUtils {
             mbps.bp.setDisposition(MimeBodyPart.INLINE);
             mbps.bp.setDataHandler(new DataHandler(new FileDataSource(path.toAbsolutePath().toString())));
             mbps.bp.setFileName(imgId + "." + TS_FileUtils.getNameType(path));
-            return TGS_Union.of(mbps);
+            return TGS_UnionExcuse.of(mbps);
         } catch (MessagingException ex) {
-            return TGS_Union.ofExcuse(ex);
+            return TGS_UnionExcuse.ofExcuse(ex);
         }
     }
 
