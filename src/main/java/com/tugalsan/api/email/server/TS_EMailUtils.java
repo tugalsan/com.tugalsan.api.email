@@ -8,12 +8,13 @@ import jakarta.mail.*;
 import jakarta.mail.internet.*;
 import com.tugalsan.api.string.client.TGS_StringUtils;
 import com.tugalsan.api.union.client.TGS_Union;
+import com.tugalsan.api.union.client.TGS_UnionExcuse;
 import java.io.UnsupportedEncodingException;
 
 public class TS_EMailUtils {
 
 //    final private static TS_Log d = TS_Log.of(TS_EMailUtils.class);
-    public static TGS_Union<Boolean> send(Properties properties,
+    public static TGS_UnionExcuse send(Properties properties,
             CharSequence fromEmail, CharSequence fromText, CharSequence password,
             CharSequence toEmails, CharSequence subjectText,
             CharSequence optionalFontCss, CharSequence bodyHtml, MimeBodyPart... files) {
@@ -22,7 +23,7 @@ public class TS_EMailUtils {
             var session = Session.getInstance(properties, auth);
             var u_msg = createMimeMessage(session, fromEmail, fromText, toEmails, subjectText);
             if (u_msg.isExcuse()) {
-                return TGS_Union.ofExcuse(u_msg.excuse());
+                return TGS_UnionExcuse.ofExcuse(u_msg.excuse());
             }
             var msg = u_msg.value();
             var mp = new MimeMultipart();
@@ -34,9 +35,9 @@ public class TS_EMailUtils {
             }
             msg.setContent(mp);
             Transport.send(msg);
-            return TGS_Union.of(true);
+            return TGS_UnionExcuse.ofVoid();
         } catch (MessagingException ex) {
-            return TGS_Union.ofExcuse(ex);
+            return TGS_UnionExcuse.ofExcuse(ex);
         }
     }
 
