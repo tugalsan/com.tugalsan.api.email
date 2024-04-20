@@ -6,7 +6,6 @@ import java.nio.file.*;
 import jakarta.activation.*;
 import jakarta.mail.*;
 import jakarta.mail.internet.*;
-import com.tugalsan.api.tuple.client.TGS_Tuple2;
 import com.tugalsan.api.string.client.TGS_StringUtils;
 import com.tugalsan.api.unsafe.client.*;
 
@@ -66,18 +65,20 @@ public class TS_EMailUtils {
         });
     }
 
-    public static TGS_Tuple2<String, MimeBodyPart> createMimeBodyPartsImg(Path path, int idx) {
+    public static MimeBodyPartsImg createMimeBodyPartsImg(Path path, int idx) {
         return TGS_UnSafe.call(() -> {
-            TGS_Tuple2<String, MimeBodyPart> mbps = TGS_Tuple2.of();
             var imgId = "img" + idx;
-            mbps.value0 = "<img src='cid:" + imgId + "'>";
-            mbps.value1 = new MimeBodyPart();
-            mbps.value1.setHeader("Content-ID", imgId);
-            mbps.value1.setDisposition(MimeBodyPart.INLINE);
-            mbps.value1.setDataHandler(new DataHandler(new FileDataSource(path.toAbsolutePath().toString())));
-            mbps.value1.setFileName(imgId + "." + TS_FileUtils.getNameType(path));
-            return mbps;
+            var mbp = new MimeBodyPart();
+            mbp.setHeader("Content-ID", imgId);
+            mbp.setDisposition(MimeBodyPart.INLINE);
+            mbp.setDataHandler(new DataHandler(new FileDataSource(path.toAbsolutePath().toString())));
+            mbp.setFileName(imgId + "." + TS_FileUtils.getNameType(path));
+            return new MimeBodyPartsImg("<img src='cid:" + imgId + "'>", mbp);
         });
+    }
+
+    public static record MimeBodyPartsImg(String html, MimeBodyPart mbp) {
+
     }
 
     public static Authenticator createAuthenticator(CharSequence fromEmail, CharSequence password) {
