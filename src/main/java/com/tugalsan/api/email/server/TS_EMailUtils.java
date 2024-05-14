@@ -7,12 +7,13 @@ import jakarta.activation.*;
 import jakarta.mail.*;
 import jakarta.mail.internet.*;
 import com.tugalsan.api.string.client.TGS_StringUtils;
+import com.tugalsan.api.union.client.TGS_UnionExcuseVoid;
 import com.tugalsan.api.unsafe.client.*;
 
 public class TS_EMailUtils {
 
 //    final private static TS_Log d = TS_Log.of(TS_EMailUtils.class);
-    public static boolean send(Properties properties,
+    public static TGS_UnionExcuseVoid send(Properties properties,
             CharSequence fromEmail, CharSequence fromText, CharSequence password,
             CharSequence toEmails, CharSequence subjectText,
             CharSequence optionalFontCss, CharSequence bodyHtml, MimeBodyPart... files) {
@@ -28,10 +29,9 @@ public class TS_EMailUtils {
             Arrays.stream(files).forEachOrdered(file -> TGS_UnSafe.run(() -> mp.addBodyPart(file)));
             msg.setContent(mp);
             Transport.send(msg);
-            return true;
+            return TGS_UnionExcuseVoid.ofVoid();
         }, e -> {
-            e.printStackTrace();
-            return false;
+            return TGS_UnionExcuseVoid.ofExcuse(e);
         });
     }
 
