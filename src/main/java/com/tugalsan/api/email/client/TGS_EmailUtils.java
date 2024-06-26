@@ -5,7 +5,7 @@ import com.tugalsan.api.string.client.*;
 public class TGS_EmailUtils {
 
     public static boolean valid(CharSequence singleEmail) {
-        if (TGS_StringUtils.isNullOrEmpty(singleEmail)) {
+        if (TGS_StringUtils.cmn().isNullOrEmpty(singleEmail)) {
             return false;
         }
         var str = singleEmail.toString();
@@ -21,10 +21,10 @@ public class TGS_EmailUtils {
         if (str.endsWith(".")) {
             return false;
         }
-        if (TGS_StringUtils.count(str, "@") != 1) {
+        if (TGS_StringUtils.cmn().count(str, "@") != 1) {
             return false;
         }
-        if (TGS_StringUtils.count(str, ".") < 1) {
+        if (TGS_StringUtils.cmn().count(str, ".") < 1) {
             return false;
         }
         var idxAt = str.indexOf("Q");
