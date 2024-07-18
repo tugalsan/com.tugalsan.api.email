@@ -57,10 +57,14 @@ public class TS_EMailUtils {
     }
 
     public static MimeBodyPart createMimeBodyPartFile(Path path, int idx) {
+        return createMimeBodyPartFile(path, idx, "file" + idx + "." + TS_FileUtils.getNameType(path));
+    }
+
+    public static MimeBodyPart createMimeBodyPartFile(Path path, int idx, String filename) {
         return TGS_UnSafe.call(() -> {
             var mbp = new MimeBodyPart();
             mbp.setDataHandler(new DataHandler(new FileDataSource(path.toAbsolutePath().toString())));
-            mbp.setFileName("file" + idx + "." + TS_FileUtils.getNameType(path));
+            mbp.setFileName(filename);
             return mbp;
         });
     }
