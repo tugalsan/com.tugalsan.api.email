@@ -1,6 +1,7 @@
 package com.tugalsan.api.email.server;
 
 import com.tugalsan.api.file.server.TS_FileUtils;
+import com.tugalsan.api.function.client.maythrow.checkedexceptions.TGS_FuncMTCEUtils;
 import java.util.*;
 import java.nio.file.*;
 import jakarta.activation.*;
@@ -8,7 +9,7 @@ import jakarta.mail.*;
 import jakarta.mail.internet.*;
 import com.tugalsan.api.string.client.TGS_StringUtils;
 import com.tugalsan.api.union.client.TGS_UnionExcuseVoid;
-import com.tugalsan.api.unsafe.client.*;
+
 
 public class TS_EMailUtils {
 
@@ -25,7 +26,7 @@ public class TS_EMailUtils {
             CharSequence toEmails, CharSequence subjectText,
             CharSequence optionalFontCss, CharSequence bodyHtml, MimeBodyPart... files) {
 
-        return TGS_UnSafe.call(() -> {
+        return TGS_FuncMTCEUtils.call(() -> {
             var auth = createAuthenticator(fromEmail, password);
             var session = Session.getInstance(properties, auth);
             var msg = createMimeMessage(session, fromEmail, fromText, toEmails, subjectText);
@@ -33,7 +34,7 @@ public class TS_EMailUtils {
             var mbp = new MimeBodyPart();
             mbp.setContent("<p " + TGS_StringUtils.cmn().toEmptyIfNull(optionalFontCss) + ">" + bodyHtml + "</p>", "text/html; charset=utf-8");
             mp.addBodyPart(mbp);
-            Arrays.stream(files).forEachOrdered(file -> TGS_UnSafe.run(() -> mp.addBodyPart(file)));
+            Arrays.stream(files).forEachOrdered(file -> TGS_FuncMTCEUtils.run(() -> mp.addBodyPart(file)));
             msg.setContent(mp);
             Transport.send(msg);
             return TGS_UnionExcuseVoid.ofVoid();
@@ -43,7 +44,7 @@ public class TS_EMailUtils {
     }
 
     public static MimeMessage createMimeMessage(Session session, CharSequence fromEmail, CharSequence fromText, CharSequence toEmails, CharSequence subjectText) {
-        return TGS_UnSafe.call(() -> {
+        return TGS_FuncMTCEUtils.call(() -> {
             var msg = new MimeMessage(session);
             msg.addHeader("Content-type", "text/HTML; charset=UTF-8");
             msg.addHeader("format", "flowed");
@@ -68,7 +69,7 @@ public class TS_EMailUtils {
     }
 
     public static MimeBodyPart createMimeBodyPartFile(Path path, int idx, String filename) {
-        return TGS_UnSafe.call(() -> {
+        return TGS_FuncMTCEUtils.call(() -> {
             var mbp = new MimeBodyPart();
             mbp.setDataHandler(new DataHandler(new FileDataSource(path.toAbsolutePath().toString())));
             mbp.setFileName(filename);
@@ -77,7 +78,7 @@ public class TS_EMailUtils {
     }
 
     public static MimeBodyPartsImg createMimeBodyPartsImg(Path path, int idx) {
-        return TGS_UnSafe.call(() -> {
+        return TGS_FuncMTCEUtils.call(() -> {
             var imgId = "img" + idx;
             var mbp = new MimeBodyPart();
             mbp.setHeader("Content-ID", imgId);
