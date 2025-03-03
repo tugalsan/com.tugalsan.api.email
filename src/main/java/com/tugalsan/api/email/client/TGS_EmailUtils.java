@@ -36,7 +36,6 @@ public class TGS_EmailUtils {
             return false;
         }
         return ";, \n\t\r".chars().mapToObj(i -> (char) i)
-                .filter(c -> str.contains(String.valueOf(c)))
-                .findAny().isEmpty();
+                .noneMatch(c -> str.contains(String.valueOf(c)));
     }
 }
