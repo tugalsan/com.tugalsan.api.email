@@ -10,8 +10,11 @@ import jakarta.mail.internet.*;
 import com.tugalsan.api.string.client.TGS_StringUtils;
 import com.tugalsan.api.union.client.TGS_UnionExcuseVoid;
 
-
 public class TS_EMailUtils {
+    
+    private TS_EMailUtils(){
+        
+    }
 
 //    final private static TS_Log d = TS_Log.of(TS_EMailUtils.class);
     public static TGS_UnionExcuseVoid send(Properties properties,
@@ -102,11 +105,14 @@ public class TS_EMailUtils {
         };
     }
 
-    public static Properties createPropertiesSSL(CharSequence smtpServer) {
+    public static Properties createPropertiesSSL(CharSequence smtpServer, boolean checkServerIdentity) {
         var props = new Properties();
         props.put("mail.smtp.host", smtpServer);
         props.put("mail.smtp.socketFactory.port", "465");
         props.put("mail.smtp.socketFactory.class", "javax.net.ssl.SSLSocketFactory");
+        if (checkServerIdentity) {
+            props.put("mail.smtp.ssl.checkserveridentity", true);
+        }
         props.put("mail.smtp.auth", "true");
         props.put("mail.smtp.port", "465");
         return props;

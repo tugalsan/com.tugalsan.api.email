@@ -4,6 +4,10 @@ import com.tugalsan.api.string.client.*;
 
 public class TGS_EmailUtils {
 
+    private TGS_EmailUtils() {
+
+    }
+
     public static boolean valid(CharSequence singleEmail) {
         if (TGS_StringUtils.cmn().isNullOrEmpty(singleEmail)) {
             return false;
