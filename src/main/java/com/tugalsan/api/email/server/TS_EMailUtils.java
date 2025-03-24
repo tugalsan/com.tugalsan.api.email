@@ -1,7 +1,7 @@
 package com.tugalsan.api.email.server;
 
 import com.tugalsan.api.file.server.TS_FileUtils;
-import com.tugalsan.api.function.client.maythrow.checkedexceptions.TGS_FuncMTCEUtils;
+import com.tugalsan.api.function.client.maythrowexceptions.checked.TGS_FuncMTCUtils;
 import java.util.*;
 import java.nio.file.*;
 import jakarta.activation.*;
@@ -29,7 +29,7 @@ public class TS_EMailUtils {
             CharSequence toEmails, CharSequence subjectText,
             CharSequence optionalFontCss, CharSequence bodyHtml, MimeBodyPart... files) {
 
-        return TGS_FuncMTCEUtils.call(() -> {
+        return TGS_FuncMTCUtils.call(() -> {
             var auth = createAuthenticator(fromEmail, password);
             var session = Session.getInstance(properties, auth);
             var msg = createMimeMessage(session, fromEmail, fromText, toEmails, subjectText);
@@ -37,7 +37,7 @@ public class TS_EMailUtils {
             var mbp = new MimeBodyPart();
             mbp.setContent("<p " + TGS_StringUtils.cmn().toEmptyIfNull(optionalFontCss) + ">" + bodyHtml + "</p>", "text/html; charset=utf-8");
             mp.addBodyPart(mbp);
-            Arrays.stream(files).forEachOrdered(file -> TGS_FuncMTCEUtils.run(() -> mp.addBodyPart(file)));
+            Arrays.stream(files).forEachOrdered(file -> TGS_FuncMTCUtils.run(() -> mp.addBodyPart(file)));
             msg.setContent(mp);
             Transport.send(msg);
             return TGS_UnionExcuseVoid.ofVoid();
@@ -47,7 +47,7 @@ public class TS_EMailUtils {
     }
 
     public static MimeMessage createMimeMessage(Session session, CharSequence fromEmail, CharSequence fromText, CharSequence toEmails, CharSequence subjectText) {
-        return TGS_FuncMTCEUtils.call(() -> {
+        return TGS_FuncMTCUtils.call(() -> {
             var msg = new MimeMessage(session);
             msg.addHeader("Content-type", "text/HTML; charset=UTF-8");
             msg.addHeader("format", "flowed");
@@ -72,7 +72,7 @@ public class TS_EMailUtils {
     }
 
     public static MimeBodyPart createMimeBodyPartFile(Path path, int idx, String filename) {
-        return TGS_FuncMTCEUtils.call(() -> {
+        return TGS_FuncMTCUtils.call(() -> {
             var mbp = new MimeBodyPart();
             mbp.setDataHandler(new DataHandler(new FileDataSource(path.toAbsolutePath().toString())));
             mbp.setFileName(filename);
@@ -81,7 +81,7 @@ public class TS_EMailUtils {
     }
 
     public static MimeBodyPartsImg createMimeBodyPartsImg(Path path, int idx) {
-        return TGS_FuncMTCEUtils.call(() -> {
+        return TGS_FuncMTCUtils.call(() -> {
             var imgId = "img" + idx;
             var mbp = new MimeBodyPart();
             mbp.setHeader("Content-ID", imgId);
