@@ -1,14 +1,13 @@
 package com.tugalsan.api.email.server;
 
-import com.tugalsan.api.file.server.TS_FileUtils;
-import com.tugalsan.api.function.client.maythrowexceptions.checked.TGS_FuncMTCUtils;
+import module com.tugalsan.api.file;
+import module com.tugalsan.api.function;
+import module com.tugalsan.api.string;
+import module com.tugalsan.api.union;
+import module jakarta.mail;
+import module jakarta.activation;
 import java.util.*;
 import java.nio.file.*;
-import jakarta.activation.*;
-import jakarta.mail.*;
-import jakarta.mail.internet.*;
-import com.tugalsan.api.string.client.TGS_StringUtils;
-import com.tugalsan.api.union.client.TGS_UnionExcuseVoid;
 
 public class TS_EMailUtils {
     
