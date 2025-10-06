@@ -15,7 +15,7 @@ public class TS_EMailUtils {
         
     }
 
-    public static TGS_UnionExcuseVoid send(Properties properties,
+    public static TGS_UnionExcuseVoid send_lst(Properties properties,
             CharSequence fromEmail, CharSequence fromText, CharSequence password,
             CharSequence toEmails, CharSequence subjectText,
             CharSequence optionalFontCss, CharSequence bodyHtml, List<MimeBodyPart> files) {
