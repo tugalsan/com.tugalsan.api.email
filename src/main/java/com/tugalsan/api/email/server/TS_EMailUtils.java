@@ -15,14 +15,16 @@ public class TS_EMailUtils {
         
     }
 
-    public static TGS_UnionExcuseVoid send_lst(Properties properties,
+    public static TGS_UnionExcuseVoid send_lst(//func name ambugious with send
+            Properties properties,
             CharSequence fromEmail, CharSequence fromText, CharSequence password,
             CharSequence toEmails, CharSequence subjectText,
             CharSequence optionalFontCss, CharSequence bodyHtml, List<MimeBodyPart> files) {
         return send(properties, fromEmail, fromText, password, toEmails, subjectText, optionalFontCss, bodyHtml, files.toArray(MimeBodyPart[]::new));
     }
 
-    public static TGS_UnionExcuseVoid send(Properties properties,
+    public static TGS_UnionExcuseVoid send(
+            Properties properties,
             CharSequence fromEmail, CharSequence fromText, CharSequence password,
             CharSequence toEmails, CharSequence subjectText,
             CharSequence optionalFontCss, CharSequence bodyHtml, MimeBodyPart... files) {
