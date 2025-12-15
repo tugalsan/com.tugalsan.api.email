@@ -1,7 +1,8 @@
 module com.tugalsan.api.email {
     requires jakarta.activation;
     requires jakarta.mail;
-    requires org.apache.tika.core;
+    requires org.simplejavamail;
+    requires org.simplejavamail.core;
     requires org.apache.poi.scratchpad;
     requires com.tugalsan.api.string;
     requires com.tugalsan.api.union;    
