@@ -13,27 +13,6 @@ public class TS_EMailConvertUtils {
 
     }
 
-    private static void addRecipients(EmailPopulatingBuilder builder, MAPIMessage input) {
-        var toRaw = TGS_FuncMTCUtils.call(() -> input.getRecipientEmailAddress(), e -> null);
-        if (toRaw != null && !toRaw.isBlank()) {
-            for (String addr : toRaw.split(";")) {
-                builder.to(addr.trim());
-            }
-        }
-        var ccRaw = TGS_FuncMTCUtils.call(() -> input.getDisplayCC(), e -> null);
-        if (ccRaw != null && !ccRaw.isBlank()) {
-            for (String addr : ccRaw.split(";")) {
-                builder.cc(addr.trim());
-            }
-        }
-        var bccRaw = TGS_FuncMTCUtils.call(() -> input.getDisplayBCC(), e -> null);
-        if (bccRaw != null && !bccRaw.isBlank()) {
-            for (String addr : bccRaw.split(";")) {
-                builder.bcc(addr.trim());
-            }
-        }
-    }
-
     public static TGS_UnionExcuseVoid convertMSG2EML(Path pathInputMsg, Path pathOutputEml) {
         return TGS_FuncMTCUtils.call(() -> {
             var input = new MAPIMessage(pathInputMsg.toFile());
@@ -55,7 +34,24 @@ public class TS_EMailConvertUtils {
                 builder.from(from);
             }
             // Recipients
-            addRecipients(builder, input);
+            var toRaw = TGS_FuncMTCUtils.call(() -> input.getRecipientEmailAddress(), e -> null);
+            if (toRaw != null && !toRaw.isBlank()) {
+                for (String addr : toRaw.split(";")) {
+                    builder.to(addr.trim());
+                }
+            }
+            var ccRaw = TGS_FuncMTCUtils.call(() -> input.getDisplayCC(), e -> null);
+            if (ccRaw != null && !ccRaw.isBlank()) {
+                for (String addr : ccRaw.split(";")) {
+                    builder.cc(addr.trim());
+                }
+            }
+            var bccRaw = TGS_FuncMTCUtils.call(() -> input.getDisplayBCC(), e -> null);
+            if (bccRaw != null && !bccRaw.isBlank()) {
+                for (String addr : bccRaw.split(";")) {
+                    builder.bcc(addr.trim());
+                }
+            }
             // Attachments
             var as = TGS_FuncMTCUtils.call(() -> input.getAttachmentFiles(), e -> null);
             if (as != null) {
