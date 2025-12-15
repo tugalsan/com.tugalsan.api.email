@@ -13,21 +13,20 @@ public class TS_EMailConvertUtils {
 
     }
 
-    private static void addRecipients(EmailPopulatingBuilder builder, MAPIMessage msg) throws ChunkNotFoundException {
-        // TO
-        var toRaw = msg.getRecipientEmailAddress();
+    private static void addRecipients(EmailPopulatingBuilder builder, MAPIMessage input) throws ChunkNotFoundException {
+        var toRaw = TGS_FuncMTCUtils.call(() -> input.getRecipientEmailAddress(), e -> null);
         if (toRaw != null && !toRaw.isBlank()) {
             for (String addr : toRaw.split(";")) {
                 builder.to(addr.trim());
             }
         }
-        String ccRaw = msg.getDisplayCC();
+        var ccRaw = TGS_FuncMTCUtils.call(() -> input.getDisplayCC(), e -> null);
         if (ccRaw != null && !ccRaw.isBlank()) {
             for (String addr : ccRaw.split(";")) {
                 builder.cc(addr.trim());
             }
         }
-        String bccRaw = msg.getDisplayBCC();
+        var bccRaw = TGS_FuncMTCUtils.call(() -> input.getDisplayBCC(), e -> null);
         if (bccRaw != null && !bccRaw.isBlank()) {
             for (String addr : bccRaw.split(";")) {
                 builder.bcc(addr.trim());
@@ -40,8 +39,8 @@ public class TS_EMailConvertUtils {
             var input = new MAPIMessage(pathInputMsg.toFile());
             var builder = EmailBuilder.startingBlank().withSubject(input.getSubject());
             // Body: prefer HTML if available, fallback to plain text
-            var htmlBody = input.getHtmlBody();
-            var textBody = input.getTextBody();
+            var htmlBody = TGS_FuncMTCUtils.call(() -> input.getHtmlBody(), e -> null);
+            var textBody = TGS_FuncMTCUtils.call(() -> input.getTextBody(), e -> null);
             if (htmlBody != null && !htmlBody.isBlank()) {
                 builder.withHTMLText(htmlBody);
                 if (textBody != null && !textBody.isBlank()) {
@@ -51,20 +50,23 @@ public class TS_EMailConvertUtils {
                 builder.withPlainText(textBody != null ? textBody : "");
             }
             // Sender
-            var from = input.getDisplayFrom();
+            var from = TGS_FuncMTCUtils.call(() -> input.getDisplayFrom(), e -> null);
             if (from != null && !from.isBlank()) {
                 builder.from(from);
             }
             // Recipients
             addRecipients(builder, input);
             // Attachments
-            for (var a : input.getAttachmentFiles()) {
-                var fn = a.getAttachLongFileName() != null
-                        ? a.getAttachLongFileName().toString()
-                        : (a.getAttachFileName() != null ? a.getAttachFileName().toString() : "attachment");
-                var fd = a.getAttachData() != null ? a.getAttachData().getValue() : null;
-                if (fd != null) {
-                    builder.withAttachment(fn, fd, "application/octet-stream");
+            var as = TGS_FuncMTCUtils.call(() -> input.getAttachmentFiles(), e -> null);
+            if (as != null) {
+                for (var a : as) {
+                    var fn = a.getAttachLongFileName() != null
+                            ? a.getAttachLongFileName().toString()
+                            : (a.getAttachFileName() != null ? a.getAttachFileName().toString() : "attachment");
+                    var fd = a.getAttachData() != null ? a.getAttachData().getValue() : null;
+                    if (fd != null) {
+                        builder.withAttachment(fn, fd, "application/octet-stream");
+                    }
                 }
             }
             // Save as EML
