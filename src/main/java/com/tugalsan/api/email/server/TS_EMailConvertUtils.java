@@ -13,7 +13,7 @@ public class TS_EMailConvertUtils {
 
     }
 
-    private static void addRecipients(EmailPopulatingBuilder builder, MAPIMessage input) throws ChunkNotFoundException {
+    private static void addRecipients(EmailPopulatingBuilder builder, MAPIMessage input) {
         var toRaw = TGS_FuncMTCUtils.call(() -> input.getRecipientEmailAddress(), e -> null);
         if (toRaw != null && !toRaw.isBlank()) {
             for (String addr : toRaw.split(";")) {
