@@ -1,10 +1,7 @@
 package com.tugalsan.api.email.server;
 
-import module org.apache.poi.scratchpad;
-import module org.simplejavamail;
 import module com.tugalsan.api.function;
 import module com.tugalsan.api.union;
-import java.nio.file.Files;
 import java.nio.file.Path;
 
 public class TS_EMailConvertUtils {
@@ -15,60 +12,7 @@ public class TS_EMailConvertUtils {
 
     public static TGS_UnionExcuseVoid convertMSG2EML(Path pathInputMsg, Path pathOutputEml) {
         return TGS_FuncMTCUtils.call(() -> {
-            var input = new MAPIMessage(pathInputMsg.toFile());
-            var builder = EmailBuilder.startingBlank().withSubject(input.getSubject());
-            // Body: prefer HTML if available, fallback to plain text
-            var htmlBody = TGS_FuncMTCUtils.call(() -> input.getHtmlBody(), e -> null);
-            var textBody = TGS_FuncMTCUtils.call(() -> input.getTextBody(), e -> null);
-            if (htmlBody != null && !htmlBody.isBlank()) {
-                builder.withHTMLText(htmlBody);
-                if (textBody != null && !textBody.isBlank()) {
-                    builder.withPlainText(textBody);
-                }
-            } else {
-                builder.withPlainText(textBody != null ? textBody : "");
-            }
-            // Sender
-            var from = TGS_FuncMTCUtils.call(() -> input.getDisplayFrom(), e -> null);
-            if (from != null && !from.isBlank()) {
-                builder.from(from);
-            }
-            // Recipients
-            var toRaw = TGS_FuncMTCUtils.call(() -> input.getRecipientEmailAddress(), e -> null);
-            if (toRaw != null && !toRaw.isBlank()) {
-                for (String addr : toRaw.split(";")) {
-                    builder.to(addr.trim());
-                }
-            }
-            var ccRaw = TGS_FuncMTCUtils.call(() -> input.getDisplayCC(), e -> null);
-            if (ccRaw != null && !ccRaw.isBlank()) {
-                for (String addr : ccRaw.split(";")) {
-                    builder.cc(addr.trim());
-                }
-            }
-            var bccRaw = TGS_FuncMTCUtils.call(() -> input.getDisplayBCC(), e -> null);
-            if (bccRaw != null && !bccRaw.isBlank()) {
-                for (String addr : bccRaw.split(";")) {
-                    builder.bcc(addr.trim());
-                }
-            }
-            // Attachments
-            var as = TGS_FuncMTCUtils.call(() -> input.getAttachmentFiles(), e -> null);
-            if (as != null) {
-                for (var a : as) {
-                    var fn = a.getAttachLongFileName() != null
-                            ? a.getAttachLongFileName().toString()
-                            : (a.getAttachFileName() != null ? a.getAttachFileName().toString() : "attachment");
-                    var fd = a.getAttachData() != null ? a.getAttachData().getValue() : null;
-                    if (fd != null) {
-                        builder.withAttachment(fn, fd, "application/octet-stream");
-                    }
-                }
-            }
-            // Save as EML
-            try (var fos = Files.newOutputStream(pathOutputEml)) {
-                EmailConverter.emailToMimeMessage(builder.buildEmail()).writeTo(fos);
-            }
+
             return TGS_UnionExcuseVoid.ofVoid();
         }, e -> TGS_UnionExcuseVoid.ofExcuse(e));
     }

@@ -6,41 +6,16 @@
     <version>1.0-SNAPSHOT</version>
   
     <dependencies>
-        
-        <!-- Jakarta Mail implementation --> 
-        <dependency> 
-            <groupId>org.eclipse.angus</groupId> 
-            <artifactId>angus-mail</artifactId> 
-            <version>2.0.5</version> 
-        </dependency> 
-        <!-- Jakarta Activation implementation --> 
-        <dependency> 
-            <groupId>org.eclipse.angus</groupId> 
-            <artifactId>angus-activation</artifactId> 
-            <version>2.0.3</version> 
-        </dependency>
-        
-        <!-- Apache POI Scratchpad (HSMF for MSG parsing) -->
         <dependency>
-            <groupId>org.apache.poi</groupId>
-            <artifactId>poi-scratchpad</artifactId>
-            <version>5.5.1</version>
+            <groupId>com.sun.activation</groupId>
+            <artifactId>jakarta.activation</artifactId>
+            <version>2.0.1</version>
         </dependency>
-
-        <!-- Simple Java Mail -->
         <dependency>
-            <groupId>org.simplejavamail</groupId>
-            <artifactId>simple-java-mail</artifactId>
-            <version>8.12.6</version>
+            <groupId>com.sun.mail</groupId>
+            <artifactId>jakarta.mail</artifactId>
+            <version>2.0.1</version>
         </dependency>
-
-        <!-- Jakarta Mail implementation (needed by Simple Java Mail) -->
-        <dependency>
-            <groupId>org.eclipse.angus</groupId>
-            <artifactId>angus-mail</artifactId>
-            <version>2.0.5</version>
-        </dependency>
-
         <dependency>
             <groupId>${project.groupId}</groupId>
             <artifactId>com.tugalsan.api.log</artifactId>
@@ -91,7 +66,7 @@
                 <version>3.14.0</version>
                 <configuration>
                     <release>25</release><!--prop.jdk-->
-                    <enablePreview>true</enablePreview><!--  
+                     <enablePreview>true</enablePreview><!--  
                     <compilerArgs>
                        <arg>- -add-modules</arg>
                         <arg>jdk.incubator.vector</arg>
