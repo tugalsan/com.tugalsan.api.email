@@ -7,6 +7,17 @@
   
     <dependencies>
         <dependency>
+            <groupId>org.simplejavamail</groupId>
+            <artifactId>outlook-module</artifactId>
+            <version>8.12.6</version>
+        </dependency>
+        <dependency>
+            <groupId>org.simplejavamail</groupId>
+            <artifactId>simple-java-mail</artifactId>
+            <version>8.12.6</version>
+        </dependency>
+        
+        <dependency>
             <groupId>com.sun.activation</groupId>
             <artifactId>jakarta.activation</artifactId>
             <version>2.0.1</version>
@@ -66,7 +77,7 @@
                 <version>3.14.0</version>
                 <configuration>
                     <release>25</release><!--prop.jdk-->
-                     <enablePreview>true</enablePreview><!--  
+                    <enablePreview>true</enablePreview><!--  
                     <compilerArgs>
                        <arg>- -add-modules</arg>
                         <arg>jdk.incubator.vector</arg>
