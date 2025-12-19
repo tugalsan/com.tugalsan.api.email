@@ -1,7 +1,7 @@
 module com.tugalsan.api.email {
     requires jakarta.activation;
     requires jakarta.mail;
-    requires outlook-message-parser;
+    //requires outlook-message-parser;
     requires com.tugalsan.api.string;
     requires com.tugalsan.api.union;    
     requires com.tugalsan.api.function;
